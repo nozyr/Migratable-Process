@@ -43,8 +43,31 @@ public class TransactionalFileInputStream extends InputStream implements
 	}
 
 	@Override
-	public int read(byte[] b) {
-		return 0;
+	public int read(byte[] b) throws IOException {
+
+		FileInputStream stream = new FileInputStream(file);
+		stream.skip(offset);
+		int num = stream.read(b);
+		stream.close();
+		if (num != -1) {
+			offset += num;
+		}
+
+		return num;
+
+	}
+
+	@Override
+	public int read(byte[] b, int off, int len) throws IOException {
+		FileInputStream stream = new FileInputStream(file);
+		stream.skip(offset);
+		int num = stream.read(b, off, len);
+		stream.close();
+		if (num != -1) {
+			offset += num;
+		}
+
+		return num;
 
 	}
 
