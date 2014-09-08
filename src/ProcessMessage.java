@@ -3,8 +3,11 @@ public class ProcessMessage {
 	private int pId; // process id
 	private MigratableProcess task;
 	private Message message;
+	private String className;
+	private String[] args;
 
-	public ProcessMessage(MigratableProcess task, Message message) {
+	public ProcessMessage(int id, MigratableProcess task, Message message) {
+		this.pId = id;
 		this.task = task;
 		this.setMessage(message);
 	}
@@ -35,6 +38,22 @@ public class ProcessMessage {
 
 	public void setMessage(Message message) {
 		this.message = message;
+	}
+
+	public String[] getArgs() {
+		return args;
+	}
+
+	public void setArgs(String[] args) {
+		this.args = args;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
 	}
 
 }

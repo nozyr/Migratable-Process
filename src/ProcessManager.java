@@ -1,10 +1,12 @@
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -21,28 +23,119 @@ public class ProcessManager {
 	private List<Integer> processList;
 	private Map<Integer, MigratableProcess> idToProcess; // mapping from process
 															// id to process
+	private Map<Integer, SlaveInfo> idToSlave;
 
 	public ProcessManager() {
+		/*
+		 * Initialize class members
+		 */
+		givenId = 0;
+		slaves = new LinkedList<SlaveInfo>();
+		processList = new LinkedList<Integer>();
+		idToProcess = new HashMap<Integer, MigratableProcess>();
+		idToSlave = new HashMap<Integer, SlaveInfo>();
+
+		slaves.add(new SlaveInfo(SLAVE_PORT_1));
+		slaves.add(new SlaveInfo(SLAVE_PORT_2));
 
 	}
 
 	public static void main(String[] args) {
+
+		ProcessManager manager = new ProcessManager();
+
 		try {
 			ServerSocket master = new ServerSocket(SERVER_PORT);
-			while (true) {
+
+			outer: while (true) {
+				Socket connection = master.accept();
+				ObjectInputStream in = new ObjectInputStream(
+						connection.getInputStream());
+				Object o = in.readObject();
+				ProcessMessage message = (ProcessMessage) o;
+
+				switch (message.getMessage()) {
+				case LAUNCH:
+					manager.lauch(message.getClassName(), message.getArgs());
+				case MIGRATE:
+					manager.Migrate(message.getpId());
+				case STOP:
+					break outer;
+				default:
+					break;
+				}
 
 			}
 
+			master.close();
+
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		while (true) {
+	}
 
+	public void remove(int id) {
+		processList.remove(new Integer(id));
+		idToProcess.remove(id);
+		idToSlave.remove(id);
+	}
+
+	/**
+	 * Migrate a process from one slave to another
+	 * 
+	 * @param id
+	 */
+	public void Migrate(int id) {
+		SlaveInfo worker = idToSlave.get(id);
+		try {
+			/*
+			 * Send message to the slave that is currently executing the task,
+			 * let it stop and send back the task.
+			 */
+			Socket socket = new Socket(worker.getHostName(), worker.getPort());
+			ProcessMessage message = new ProcessMessage(id, null,
+					Message.MIGRATE);
+			ObjectOutputStream out = new ObjectOutputStream(
+					socket.getOutputStream());
+			out.writeObject(message);
+			ObjectInputStream in = new ObjectInputStream(
+					socket.getInputStream());
+			Object o = in.readObject();
+			socket.close();
+
+			/*
+			 * Migrate the task to a new worker to execute
+			 */
+			MigratableProcess toMigrate = (MigratableProcess) o;
+			int index = slaves.indexOf(worker);
+			index++;
+			SlaveInfo newWorker = slaves.get(index % slaves.size());
+			socket = new Socket(newWorker.getHostName(), newWorker.getPort());
+			message = new ProcessMessage(id, toMigrate, Message.LAUNCH);
+			out = new ObjectOutputStream(socket.getOutputStream());
+			out.writeObject(message);
+			socket.close();
+
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
-	
-	
+
+	/**
+	 * Get a process name and sent it to a slave for launching
+	 * 
+	 * @param className
+	 * @param args
+	 */
 	public void lauch(String className, String args[]) {
 
 		try {
@@ -64,13 +157,14 @@ public class ProcessManager {
 			idToProcess.put(id, process);
 
 			/*
-			 * Encapsulate the process with a lauching message
+			 * Encapsulate the process with a launching message
 			 */
-			ProcessMessage launchingMessage = new ProcessMessage(process,
+			ProcessMessage launchingMessage = new ProcessMessage(id, process,
 					Message.LAUNCH);
 			Random r = new Random();
 			int slaveId = r.nextInt(slaves.size());
 			SlaveInfo worker = slaves.get(slaveId);
+			idToSlave.put(id, worker);
 
 			/*
 			 * Send the task to a slave
