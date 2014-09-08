@@ -15,14 +15,14 @@ public class TransactionalFileOutputStream extends OutputStream implements
 	
 	private Boolean append;
 	
-	private int offset;
+//	private int offset;
 	
 	private Boolean firstime;
 	
 	public TransactionalFileOutputStream(String file_name, Boolean Append){
 		this.file_name = file_name;
 		this.append = Append;
-		this.offset = 0;
+//		this.offset = 0;
 		this.firstime = true;
 	}
 	
@@ -38,7 +38,7 @@ public class TransactionalFileOutputStream extends OutputStream implements
 		output.write(b);
 		output.flush();
 		output.close();
-		this.offset += 1;
+//		this.offset += 1;
 		this.firstime = false;
 	}
 	
@@ -55,7 +55,7 @@ public class TransactionalFileOutputStream extends OutputStream implements
 		output.write(b);
 		output.flush();
 		output.close();
-		this.offset += b.length;
+//		this.offset += b.length;
 		this.firstime = false;
 	}
 	@Override
@@ -70,7 +70,7 @@ public class TransactionalFileOutputStream extends OutputStream implements
 		output.write(b, off, len);
 		output.flush();
 		output.close();
-		this.offset += off;
+//		this.offset += off;
 		this.firstime = false;
 	}
 	
