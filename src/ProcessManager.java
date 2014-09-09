@@ -15,9 +15,9 @@ import java.util.Random;
 
 public class ProcessManager {
 
-	private static final int SERVER_PORT = 440;
-	private static final int SLAVE_PORT_1 = 441;
-	private static final int SLAVE_PORT_2 = 442;
+	private static final int SERVER_PORT = 1440;
+	private static final int SLAVE_PORT_1 = 1441;
+	private static final int SLAVE_PORT_2 = 1442;
 
 	private int givenId;
 	private List<SlaveInfo> slaves;

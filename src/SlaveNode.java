@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 public class SlaveNode {
 
-	private static final int PORT_NUMBER = 441;
+	private static final int PORT_NUMBER = 1441;
 	private static HashMap<Integer, MigratableProcess> TaskMap;
 
 	public static void main(String[] args) {
@@ -15,18 +15,13 @@ public class SlaveNode {
 		TaskMap = new HashMap<Integer, MigratableProcess>();
 
 		try {
-			listen_Socket = new ServerSocket(PORT_NUMBER);
+			listen_Socket = new ServerSocket(Integer.parseInt(args[0]));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.printf("Cannot bind to Port Number %d", PORT_NUMBER);
+			System.out.printf("Cannot bind to Port Number %d", Integer.parseInt(args[0]));
 			e.printStackTrace();
 			System.exit(-1);
 		}
-
-		// Socket send_Socket = new Socket();
-		//
-		// ObjectOutputStream oos = new
-		// ObjectOutputStream(Socket.getOutputStream());
 
 		while (true) {
 			Socket Accept_Socket = null;

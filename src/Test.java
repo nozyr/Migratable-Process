@@ -3,10 +3,13 @@ import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.io.File;
 
 public class Test {
 	private static final String HOST = "localhost";
-	private static final int PORT = 440;
+	private static final int PORT = 1440;
+    private static final int SLAVEPORT1 = 1441;
+    private static final int SLAVEPORT2 = 1442;
 
 	public static void main(String args[]) {
 		try {
@@ -34,6 +37,7 @@ public class Test {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
 
 			System.out.println("WTF");
 

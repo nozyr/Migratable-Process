@@ -7,7 +7,7 @@ import java.lang.InterruptedException;
 
 public class GrepProcess implements MigratableProcess {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2757242538506557482L;
 	private TransactionalFileInputStream inFile;
@@ -37,7 +37,7 @@ public class GrepProcess implements MigratableProcess {
 			while (!suspending) {
 
 				String line = in.readLine();
-				System.out.println("read line: " + line);
+				// System.out.println("read line: " + line);
 
 				if (line == null)
 					break;
