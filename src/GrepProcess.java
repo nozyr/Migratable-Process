@@ -14,9 +14,9 @@ public class GrepProcess implements MigratableProcess {
 	private TransactionalFileOutputStream outFile;
 	private String query;
 
-	private volatile boolean suspending;
+	private volatile boolean suspending = false;
 
-	public GrepProcess(String args[]) throws Exception {
+	public GrepProcess(String[] args) throws Exception {
 		if (args.length != 3) {
 			System.out
 					.println("usage: GrepProcess <queryString> <inputFile> <outputFile>");
@@ -29,18 +29,22 @@ public class GrepProcess implements MigratableProcess {
 	}
 
 	public void run() {
+		System.out.println("start running");
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
 
 		try {
 			while (!suspending) {
+
 				String line = in.readLine();
+				System.out.println("read line: " + line);
 
 				if (line == null)
 					break;
 
 				if (line.contains(query)) {
 					out.println(line);
+					System.out.println(line);
 				}
 
 				// Make grep take longer so that we don't require extremely
@@ -56,7 +60,7 @@ public class GrepProcess implements MigratableProcess {
 		} catch (IOException e) {
 			System.out.println("GrepProcess: Error: " + e);
 		}
-
+		out.close();
 		suspending = false;
 	}
 

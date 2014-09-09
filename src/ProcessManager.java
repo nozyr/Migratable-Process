@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
@@ -53,12 +54,18 @@ public class ProcessManager {
 						connection.getInputStream());
 				Object o = in.readObject();
 				ProcessMessage message = (ProcessMessage) o;
+				OutputStream out = connection.getOutputStream();
 
 				switch (message.getMessage()) {
 				case LAUNCH:
-					manager.lauch(message.getClassName(), message.getArgs());
+					int assignedId = manager.lauch(message.getClassName(),
+							message.getArgs());
+					out.write(assignedId);
+					connection.close();
+					break;
 				case MIGRATE:
 					manager.Migrate(message.getpId());
+					break;
 				case STOP:
 					break outer;
 				default:
@@ -136,8 +143,9 @@ public class ProcessManager {
 	 * @param className
 	 * @param args
 	 */
-	public void lauch(String className, String args[]) {
+	public int lauch(String className, String[] args) {
 
+		int id = -1;
 		try {
 			/*
 			 * Instantiate the task from the given name and arguments
@@ -145,13 +153,13 @@ public class ProcessManager {
 			Class<?> task;
 			task = Class.forName(className);
 			Constructor<?> c = task.getDeclaredConstructor(String[].class);
-			Object o = c.newInstance((Object[]) args);
+			Object o = c.newInstance((Object) args);
 			MigratableProcess process = (MigratableProcess) o;
 
 			/*
 			 * Put the task into the working process list
 			 */
-			int id = givenId;
+			id = givenId;
 			givenId++;
 			processList.add(id);
 			idToProcess.put(id, process);
@@ -187,6 +195,8 @@ public class ProcessManager {
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
+
+		return id;
 
 	}
 }

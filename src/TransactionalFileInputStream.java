@@ -21,10 +21,12 @@ public class TransactionalFileInputStream extends InputStream implements
 
 	public TransactionalFileInputStream(File file) {
 		this.file = file;
+		offset = 0;
 	}
 
 	public TransactionalFileInputStream(String file) {
 		this.file = new File(file);
+		offset = 0;
 	}
 
 	@Override

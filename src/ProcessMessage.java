@@ -1,4 +1,11 @@
-public class ProcessMessage {
+import java.io.Serializable;
+
+public class ProcessMessage implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3467973832854667253L;
 
 	private int pId; // process id
 	private MigratableProcess task;

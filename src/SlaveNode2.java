@@ -5,9 +5,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
-public class SlaveNode {
+public class SlaveNode2 {
 
-	private static final int PORT_NUMBER = 441;
+	private static final int PORT_NUMBER = 442;
 	private static HashMap<Integer, MigratableProcess> TaskMap;
 
 	public static void main(String[] args) {
