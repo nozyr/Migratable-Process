@@ -7,35 +7,29 @@ import java.util.HashMap;
 
 public class SlaveNode {
 
-	private static int port;
+	private static final int PORT_NUMBER = 1441;
 	private static HashMap<Integer, MigratableProcess> TaskMap;
 
-	public SlaveNode(int port) {
-		this.port = port;
-	}
-
 	public static void main(String[] args) {
-		ServerSocket listenSocket = null;
+		ServerSocket listen_Socket = null;
 		TaskMap = new HashMap<Integer, MigratableProcess>();
 
 		try {
-			listenSocket = new ServerSocket(port);
+
+			listen_Socket = new ServerSocket(Integer.parseInt(args[0]));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.printf("Cannot bind to Port Number %d", port);
+			System.out.printf("Cannot bind to Port Number %d",
+					Integer.parseInt(args[0]));
 			e.printStackTrace();
 			System.exit(-1);
 		}
 
-		// Socket send_Socket = new Socket();
-		//
-		// ObjectOutputStream oos = new
-		// ObjectOutputStream(Socket.getOutputStream());
 		outer: while (true) {
 			Socket Accept_Socket = null;
 			ObjectInputStream ois = null;
 			try {
-				Accept_Socket = listenSocket.accept();
+				Accept_Socket = listen_Socket.accept();
 				System.out.println("Accpeted a command");
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
