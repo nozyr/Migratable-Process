@@ -29,7 +29,6 @@ public class GrepProcess implements MigratableProcess {
 	}
 
 	public void run() {
-		System.out.println("start running");
 		PrintStream out = new PrintStream(outFile);
 		DataInputStream in = new DataInputStream(inFile);
 
@@ -60,7 +59,6 @@ public class GrepProcess implements MigratableProcess {
 		} catch (IOException e) {
 			System.out.println("GrepProcess: Error: " + e);
 		}
-		out.close();
 		suspending = false;
 	}
 

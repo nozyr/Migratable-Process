@@ -7,18 +7,22 @@ import java.util.HashMap;
 
 public class SlaveNode {
 
-	private static final int PORT_NUMBER = 441;
+	private static int port;
 	private static HashMap<Integer, MigratableProcess> TaskMap;
 
+	public SlaveNode(int port) {
+		this.port = port;
+	}
+
 	public static void main(String[] args) {
-		ServerSocket listen_Socket = null;
+		ServerSocket listenSocket = null;
 		TaskMap = new HashMap<Integer, MigratableProcess>();
 
 		try {
-			listen_Socket = new ServerSocket(PORT_NUMBER);
+			listenSocket = new ServerSocket(port);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.printf("Cannot bind to Port Number %d", PORT_NUMBER);
+			System.out.printf("Cannot bind to Port Number %d", port);
 			e.printStackTrace();
 			System.exit(-1);
 		}
@@ -27,12 +31,11 @@ public class SlaveNode {
 		//
 		// ObjectOutputStream oos = new
 		// ObjectOutputStream(Socket.getOutputStream());
-
-		while (true) {
+		outer: while (true) {
 			Socket Accept_Socket = null;
 			ObjectInputStream ois = null;
 			try {
-				Accept_Socket = listen_Socket.accept();
+				Accept_Socket = listenSocket.accept();
 				System.out.println("Accpeted a command");
 			} catch (IOException e1) {
 				// TODO Auto-generated catch block
@@ -70,7 +73,7 @@ public class SlaveNode {
 			case RESTART:
 				break;
 			case STOP:
-				break;
+				break outer;
 			case MIGRATE:
 				if (TaskMap.containsKey(task_Message.getpId())) {
 					MigratableProcess task = TaskMap.get(task_Message.getpId());
@@ -98,5 +101,6 @@ public class SlaveNode {
 			}
 
 		}
+
 	}
 }

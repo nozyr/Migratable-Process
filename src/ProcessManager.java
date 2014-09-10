@@ -13,6 +13,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * The ProcessManager class that represents the manager of launching, migrating
+ * and suspending process
+ * 
+ * @author weisiyu
+ * 
+ */
 public class ProcessManager {
 
 	private static final int SERVER_PORT = 440;
@@ -36,6 +43,9 @@ public class ProcessManager {
 		idToProcess = new HashMap<Integer, MigratableProcess>();
 		idToSlave = new HashMap<Integer, SlaveInfo>();
 
+		/*
+		 * Add two slaves
+		 */
 		slaves.add(new SlaveInfo(SLAVE_PORT_1));
 		slaves.add(new SlaveInfo(SLAVE_PORT_2));
 
@@ -49,6 +59,9 @@ public class ProcessManager {
 			ServerSocket master = new ServerSocket(SERVER_PORT);
 
 			outer: while (true) {
+				/*
+				 * The process managers is polling for connections
+				 */
 				Socket connection = master.accept();
 				ObjectInputStream in = new ObjectInputStream(
 						connection.getInputStream());
@@ -56,21 +69,38 @@ public class ProcessManager {
 				ProcessMessage message = (ProcessMessage) o;
 				OutputStream out = connection.getOutputStream();
 
+				/*
+				 * After receiving a message, the process manager behave
+				 * according to the message
+				 */
+
 				switch (message.getMessage()) {
 				case LAUNCH:
+					/*
+					 * The manager launches a process when receiving "launch"
+					 * and give back the assigned pId
+					 */
 					int assignedId = manager.lauch(message.getClassName(),
 							message.getArgs());
 					out.write(assignedId);
-					connection.close();
 					break;
 				case MIGRATE:
+					/*
+					 * The manager migrate the process
+					 */
 					manager.Migrate(message.getpId());
 					break;
 				case STOP:
+					/*
+					 * the process manager process stops upon receiving message
+					 * /* of "STOP
+					 */
 					break outer;
 				default:
 					break;
 				}
+
+				connection.close();
 
 			}
 
@@ -85,6 +115,10 @@ public class ProcessManager {
 
 	}
 
+	/**
+	 * 
+	 * @param id
+	 */
 	public void remove(int id) {
 		processList.remove(new Integer(id));
 		idToProcess.remove(id);
@@ -118,9 +152,17 @@ public class ProcessManager {
 			 * Migrate the task to a new worker to execute
 			 */
 			MigratableProcess toMigrate = (MigratableProcess) o;
+
+			/*
+			 * Assign the task to the next slave
+			 */
 			int index = slaves.indexOf(worker);
 			index++;
 			SlaveInfo newWorker = slaves.get(index % slaves.size());
+
+			/*
+			 * Send the task to the new slave for executing
+			 */
 			socket = new Socket(newWorker.getHostName(), newWorker.getPort());
 			message = new ProcessMessage(id, toMigrate, Message.LAUNCH);
 			out = new ObjectOutputStream(socket.getOutputStream());
@@ -148,7 +190,8 @@ public class ProcessManager {
 		int id = -1;
 		try {
 			/*
-			 * Instantiate the task from the given name and arguments
+			 * Instantiate the task from the given name and arguments with Java
+			 * reflection
 			 */
 			Class<?> task;
 			task = Class.forName(className);
@@ -175,7 +218,7 @@ public class ProcessManager {
 			idToSlave.put(id, worker);
 
 			/*
-			 * Send the task to a slave
+			 * Sends the task with the message to a slave
 			 */
 			try {
 				Socket s = new Socket(worker.getHostName(), worker.getPort());
