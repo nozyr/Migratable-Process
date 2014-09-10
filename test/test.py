@@ -23,8 +23,8 @@ def ctl_c(signal, frame):
 def main():
 	os.chdir('../src')
 	os.system("javac -d ../bin/ ./*.java")
-	slv_1_args = ["java", "-cp", "../bin", "SlaveNode", "1441"]
-	slv_2_args = ["java", "-cp", "../bin", "SlaveNode", "1442"]
+	slv_1_args = ["java", "-cp", "../bin", "SlaveNode", "1441", "1"]
+	slv_2_args = ["java", "-cp", "../bin", "SlaveNode", "1442", "2"]
 	mng_args = ["java", "-cp", "../bin", "ProcessManager"]
 	test_args = ["java", "-cp", "../bin", "Test"]
 

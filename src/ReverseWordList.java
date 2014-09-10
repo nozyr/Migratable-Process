@@ -9,7 +9,7 @@ import java.io.PrintStream;
 
 public class ReverseWordList implements MigratableProcess{
     private enum Phase {
-        Reading, Trim, CountLength, Reverse, Write
+        Reading, Trim, CountLength, Reverse, Write, Finished
     }
     private static final long serialVersionUID = -123456789;
     private TransactionalFileInputStream inFile;
@@ -34,7 +34,6 @@ public class ReverseWordList implements MigratableProcess{
     }
 
     public void run() {
-        System.out.println("Slave Node task start running");
         PrintStream out = new PrintStream(outFile);
         DataInputStream in = new DataInputStream(inFile);
 
@@ -44,9 +43,9 @@ public class ReverseWordList implements MigratableProcess{
                 switch (this.phase) {
                     case Reading:
                         this.line = in.readLine();
-                        System.out.println(this.line);
                         if (this.line == null){
-                            throw new EOFException();
+                           this.phase = Phase.Finished;
+                            continue;
                         }
                         this.phase = Phase.Trim;
                         break;
@@ -87,6 +86,9 @@ public class ReverseWordList implements MigratableProcess{
                         this.Reversed = "";
                         this.phase = Phase.Reading;
                         break;
+                    case Finished:
+                        System.out.println("Task Finished");
+                        this.suspend();
                     default:
                         break;
                 }
