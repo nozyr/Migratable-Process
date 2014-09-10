@@ -15,15 +15,17 @@ public class SlaveNode {
 		TaskMap = new HashMap<Integer, MigratableProcess>();
 
 		try {
+
 			listen_Socket = new ServerSocket(Integer.parseInt(args[0]));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.printf("Cannot bind to Port Number %d", Integer.parseInt(args[0]));
+			System.out.printf("Cannot bind to Port Number %d",
+					Integer.parseInt(args[0]));
 			e.printStackTrace();
 			System.exit(-1);
 		}
 
-		while (true) {
+		outer: while (true) {
 			Socket Accept_Socket = null;
 			ObjectInputStream ois = null;
 			try {
@@ -65,7 +67,7 @@ public class SlaveNode {
 			case RESTART:
 				break;
 			case STOP:
-				break;
+				break outer;
 			case MIGRATE:
 				if (TaskMap.containsKey(task_Message.getpId())) {
 					MigratableProcess task = TaskMap.get(task_Message.getpId());
@@ -93,5 +95,6 @@ public class SlaveNode {
 			}
 
 		}
+
 	}
 }
