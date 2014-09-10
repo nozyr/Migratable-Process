@@ -21,7 +21,7 @@ public class Test {
 			arg1[1] = "in.txt";
 			arg1[2] = "out.txt";
 
-			launchGrep.setClassName("GrepProcess");
+			launchGrep.setClassName("ReverseWordList");
 			launchGrep.setArgs(arg1);
 			launchGrep.setMessage(Message.LAUNCH);
 
@@ -37,9 +37,6 @@ public class Test {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-
-			System.out.println("WTF");
 
 			connection.close();
 

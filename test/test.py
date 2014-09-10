@@ -17,22 +17,20 @@ def ctl_c(signal, frame):
 	for slv_process in Slv_processes:
 		slv_process.terminate()
 
-	os.system("rm *.class")
 	sys.exit()
 
 
 def main():
-	os.chdir('../src/')
-	os.system("javac *.java")
-	slv_1_args = ["java", "-cp", "./", "SlaveNode", "1441"]
-	slv_2_args = ["java", "-cp", "./", "SlaveNode", "1442"]
-	mng_args = ["java", "-cp", "./", "ProcessManager"]
-	test_args = ["java", "-cp", "./", "Test"]
+	os.chdir('../src')
+	os.system("javac -d ../bin/ ./*.java")
+	slv_1_args = ["java", "-cp", "../bin", "SlaveNode", "1441"]
+	slv_2_args = ["java", "-cp", "../bin", "SlaveNode", "1442"]
+	mng_args = ["java", "-cp", "../bin", "ProcessManager"]
+	test_args = ["java", "-cp", "../bin", "Test"]
 
 	Slv_processes.append(subprocess.Popen(slv_1_args))
 	Slv_processes.append(subprocess.Popen(slv_2_args))
 	Manager_Process = subprocess.Popen(mng_args)
-
 	Test_process = subprocess.Popen(test_args)
 
 	while True:
