@@ -63,7 +63,7 @@ public class ProcessManager {
 			slaves.add(new SlaveInfo(port));
 		}
 		System.out.println(slaves.size() + "slaves are started");
-		this.startSlaves();
+		// this.startSlaves();
 		Thread executor = new Thread(new UserCommandExecutor(scan));
 		executor.start();
 
