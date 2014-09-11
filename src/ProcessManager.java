@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 /**
  * The ProcessManager class that represents the manager of launching, migrating
@@ -22,9 +23,7 @@ import java.util.Random;
  */
 public class ProcessManager {
 
-	private static final int SERVER_PORT = 1440;
-	private static final int SLAVE_PORT_1 = 1441;
-	private static final int SLAVE_PORT_2 = 1442;
+	private static final int SERVER_PORT = 15440;
 
 	private int givenId;
 	private List<SlaveInfo> slaves;
@@ -32,6 +31,7 @@ public class ProcessManager {
 	private Map<Integer, MigratableProcess> idToProcess; // mapping from process
 															// id to process
 	private Map<Integer, SlaveInfo> idToSlave;
+	private List<Process> runningNodes;
 
 	public ProcessManager() {
 		/*
@@ -42,13 +42,48 @@ public class ProcessManager {
 		processList = new LinkedList<Integer>();
 		idToProcess = new HashMap<Integer, MigratableProcess>();
 		idToSlave = new HashMap<Integer, SlaveInfo>();
+		runningNodes = new LinkedList<Process>();
 
-		/*
-		 * Add two slaves
-		 */
-		slaves.add(new SlaveInfo(SLAVE_PORT_1));
-		slaves.add(new SlaveInfo(SLAVE_PORT_2));
+		this.setUp();
 
+	}
+
+	/**
+	 * Set up configuration by user inputs
+	 */
+	private void setUp() {
+
+		Scanner scan = new Scanner(System.in);
+		System.out.println("How many slaves will be running?");
+		int numSlave = Integer.parseInt(scan.nextLine());
+		for (int i = 0; i < numSlave; i++) {
+			System.out.println("Type in the assigned port for slave " + (i + 1)
+					+ ":");
+			int port = Integer.parseInt(scan.nextLine());
+			slaves.add(new SlaveInfo(port));
+		}
+		System.out.println(slaves.size() + "slaves are started");
+		this.startSlaves();
+		Thread executor = new Thread(new UserCommandExecutor(scan));
+		executor.start();
+
+	}
+
+	private void startSlaves() {
+		for (int i = 0; i < slaves.size(); i++) {
+			ProcessBuilder builder = new ProcessBuilder("java", "SlaveNode",
+					String.valueOf(slaves.get(i).getPort()), String.valueOf(i));
+
+			builder.redirectErrorStream(true);
+			builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
+			try {
+				Process node = builder.start();
+				runningNodes.add(node);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public static void main(String[] args) {
@@ -63,6 +98,7 @@ public class ProcessManager {
 				 * The process managers is polling for connections
 				 */
 				Socket connection = master.accept();
+				System.out.println("wtf");
 				ObjectInputStream in = new ObjectInputStream(
 						connection.getInputStream());
 				Object o = in.readObject();
@@ -80,6 +116,7 @@ public class ProcessManager {
 					 * The manager launches a process when receiving "launch"
 					 * and give back the assigned pId
 					 */
+					System.out.println("Launch");
 					int assignedId = manager.lauch(message.getClassName(),
 							message.getArgs());
 					out.write(assignedId);
