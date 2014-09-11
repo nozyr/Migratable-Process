@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 /**
- * Created by WITAN on 9/10/14.
+ * Created by yuruiz on 9/10/14.
  */
 
 public class ReverseWordList implements MigratableProcess{

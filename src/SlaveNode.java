@@ -5,15 +5,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
+/*
+* Created by yuruiz
+*
+*/
 public class SlaveNode {
 
 	private static HashMap<Integer, MigratableProcess> TaskMap;
 
 	public static void main(String[] args) throws Exception {
-		if (args.length != 2) {
-			System.out.println("usage: SlaveNode <portNum> <nodeID>");
-			throw new Exception("Invalid Arguments");
-		}
+        if (args.length != 2) {
+            System.out.println("usage: SlaveNode <portNum> <nodeID>");
+            throw new Exception("Invalid Arguments");
+        }
 		ServerSocket listen_Socket = null;
 		TaskMap = new HashMap<Integer, MigratableProcess>();
 
@@ -75,8 +79,12 @@ public class SlaveNode {
 				}
 				break;
 			case RESTART:
-				break;
-			case STOP:
+                System.out.println("Command " + Message.STOP.name() + " Received at Node " + args[1]);
+                if (TaskMap.containsKey(task_Message.getpId())){
+                    MigratableProcess task = TaskMap.get(task_Message.getpId());
+                    Thread task_rs = new Thread(task);
+                    task_rs.start();
+                }
 				break;
 			case MIGRATE:
 				/*
