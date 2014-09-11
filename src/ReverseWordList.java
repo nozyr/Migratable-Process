@@ -68,7 +68,6 @@ public class ReverseWordList implements MigratableProcess{
                             if(this.line.charAt(i)==' ')
                             {
                                 this.Reversed=this.Reversed + this.line.substring(i, this.end);
-//                                System.out.println(this.Reversed);
                                 if(i!=0)
                                 {
                                     while(this.line.charAt(i-1)==' ')
@@ -79,6 +78,7 @@ public class ReverseWordList implements MigratableProcess{
                                 }
                             }
                         }
+                        System.out.println(this.Reversed);
                         this.phase = Phase.Write;
                         break;
                     case Write:
@@ -93,16 +93,18 @@ public class ReverseWordList implements MigratableProcess{
                         break;
                 }
 
-                // Make grep take longer so that we don't require extremely
-                // large files for interesting results
+                /*
+                Make grep take longer so that we don't require extremely
+                large files for interesting results
+                */
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
-                    // ignore it
+                    /* ignore it */
                 }
             }
         } catch (EOFException e) {
-            // End of File
+            /* End of File */
         } catch (IOException e) {
             System.out.println("GrepProcess: Error: " + e);
         }

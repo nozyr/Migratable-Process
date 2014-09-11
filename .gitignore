@@ -9,3 +9,4 @@
 /TransactionalFileInputStream.class
 /TransactionalFileOutputStream.class
 /bin
+*.class

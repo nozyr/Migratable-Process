@@ -29,6 +29,11 @@ would be used between ProcessManager and SlaveNode:
    locate the corresponding task in hashmap. If the task object is found, the SlaveNode will use create a new method to
    run the task.
 
+4. Migrate Message:
+   The ProcessManager will send the task id along with message. The SlaveNode, after receiving the message, will try to
+    locate the corresponding task in hashmap. If the task object is found, the SlaveNode will use the suspend() methond
+    to suspend the task and send the task object back to the ProcessManager.
+
 The process of executing the SlaveNode and ProcessManager is as below:
 
 1. Running the SlaveNode with the argument as below:
