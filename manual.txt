@@ -1,0 +1,51 @@
+Manual
+
+There are two ways for running our framework, one is designed to be automatic in order to save your time. The other is used to show that process are really being migrated.
+
+
+
+
+1.Running the framework from ProcessManager (LINUX/MAC OS)
+
+To start the process manager, locate the terminal to the /src directory and run 
+
+¡°java ProcessManager¡±.
+
+This way, the process manager is started and you can follow the given instructions to set up server. After you specify the ports slaves will be running on, process manager will automatically starts the slaves for you using java ProcessBuilder and the standard output of the sub-process are redirected to the current terminal.
+
+Then you can type commands:
+
+<Operation> <Process name/id>
+
+Specifically, ¡°launch¡± should pair with a process name such as:
+
+¡°launch GrepProcess¡±
+
+Then the manager will ask you for arguments.
+
+Other operations shall pair with a give process id like:
+
+¡°suspend 3¡±
+¡°migrate 5¡±
+¡°migrate 1¡±
+
+Since the standard output is already redirected, all the prints on the slaves sides will be showed on the current terminal (I/O redirect might not be correctly working on windows causing no output on the terminal).
+
+
+
+
+2.Running the framework on ProcessManagerShowOff
+
+This way of running the framework is designed to show that the process manager and slaves are actually all running on different processes and the tasks are really migrated by network I/O(sockets).
+
+The only difference is that the process manager will not automatically start the slaves (but you still have to specify the ports they will be running). To run the framework this way, first you should run
+
+¡°java ProcessManagerShowOff¡± 
+
+Then you shall open several other terminals and run
+
+¡°java SlaveNode <port number> <slave id>¡±
+
+The port numbers you give to these slave processes shall match those you give to process manager.
+All other commands are the same and now you can migrate a process when it¡¯s executing and see all the standard outputs migrate from one terminal to another.
+
