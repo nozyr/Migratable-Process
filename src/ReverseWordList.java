@@ -23,7 +23,7 @@ public class ReverseWordList implements MigratableProcess{
 
     public ReverseWordList(String[] args) throws Exception {
         if (args.length != 3) {
-            System.out.println("usage: GrepProcess <inputFile> <outputFile>");
+            System.out.println("usage: ReverseWordList <inputFile> <outputFile>");
             throw new Exception("Invalid Arguments");
         }
 
@@ -106,7 +106,7 @@ public class ReverseWordList implements MigratableProcess{
         } catch (EOFException e) {
             /* End of File */
         } catch (IOException e) {
-            System.out.println("GrepProcess: Error: " + e);
+            System.out.println("ReverseWordList: Error: " + e);
         }
         out.close();
         suspending = false;

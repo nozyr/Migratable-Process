@@ -112,6 +112,7 @@ public class SlaveNode {
 				}
 				break;
 			default:
+                System.out.println("Unknown Message Received!!");
 				break;
 
 			}
