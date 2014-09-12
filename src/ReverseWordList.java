@@ -89,7 +89,7 @@ public class ReverseWordList implements MigratableProcess{
                         break;
                     case Finished:
                         System.out.println("Task Finished");
-                        this.suspend();
+                        suspending = true;
                     default:
                         break;
                 }
@@ -113,9 +113,9 @@ public class ReverseWordList implements MigratableProcess{
         suspending = false;
     }
 
-    public void suspend() {
+    public void suspend(Thread thd) {
         suspending = true;
-        while (suspending);
+        while (thd.getState() != Thread.State.TERMINATED);
     }
 }
 

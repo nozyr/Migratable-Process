@@ -24,11 +24,10 @@ public class FactorialProcess implements MigratableProcess {
 	}
 
 	@Override
-	public void suspend() {
-		suspending = true;
-		while (suspending)
-			;
-	}
+    public void suspend(Thread thd) {
+        suspending = true;
+        while (thd.getState() != Thread.State.TERMINATED);
+    }
 
 	@Override
 	public void run() {

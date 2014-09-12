@@ -63,10 +63,9 @@ public class GrepProcess implements MigratableProcess {
 		out.close();
 	}
 
-	public void suspend() {
-		suspending = true;
-		while (suspending)
-			;
-	}
+    public void suspend(Thread thd) {
+        suspending = true;
+        while (thd.getState() != Thread.State.TERMINATED);
+    }
 
 }
