@@ -84,6 +84,10 @@ public class SlaveNode {
                 case RESTART:
                     System.out.println("Command " + Message.RESTART.name() + " Received at Node " + args[1]);
                     if (TaskMap.containsKey(task_Message.getpId())) {
+                        if (ThdMap.containsKey(task_Message.getpId())) {
+                            System.out.printf("Task %d already running", task_Message.getpId());
+                            break;
+                        }
                         MigratableProcess task = TaskMap.get(task_Message.getpId());
                         Thread task_rs = new Thread(task);
                         ThdMap.put(task_Message.getpId(), task_rs);
