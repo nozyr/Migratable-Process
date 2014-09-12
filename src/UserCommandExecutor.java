@@ -50,7 +50,7 @@ public class UserCommandExecutor implements Runnable {
 				if (arguments.length != NUM_ARGS) {
 					printUsage();
 				} else {
-					Message message = mapping.get(arguments[0]);
+					Message message = mapping.get(arguments[0].toLowerCase());
 					ProcessMessage task = new ProcessMessage();
 					if (message == null) {
 						printUsage();
@@ -128,12 +128,14 @@ public class UserCommandExecutor implements Runnable {
 				.println("*** Usage <Operation> <Process Name/Process Id> ***");
 		System.out.println("*** Launch Process Name / Migrate Process Id***");
 		System.out
-				.println("*** Sample Usage:\n***launch GrepProcess***\n***migrate 2\n***");
+				.println("*** Sample Usage: ***\n*** launch GrepProcess***\n*** migrate 2 ***\n");
 	}
 
 	private static void setUp() {
 		mapping.put("launch", Message.LAUNCH);
 		mapping.put("migrate", Message.MIGRATE);
+		mapping.put("suspend", Message.SUSPEND);
+		mapping.put("restart", Message.RESTART);
 		printUsage();
 	}
 

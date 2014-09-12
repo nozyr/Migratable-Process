@@ -69,6 +69,9 @@ public class ProcessManager {
 
 	}
 
+	/**
+	 * Let slaves start running
+	 */
 	private void startSlaves() {
 		for (int i = 0; i < slaves.size(); i++) {
 			ProcessBuilder builder = new ProcessBuilder("java", "SlaveNode",
@@ -132,11 +135,13 @@ public class ProcessManager {
 					 * Suspend the process with the given ID
 					 */
 					manager.sendMessage(message.getpId(), Message.SUSPEND);
+					break;
 				case RESTART:
 					/*
 					 * Restart the process with the given ID
 					 */
 					manager.sendMessage(message.getpId(), Message.RESTART);
+					break;
 				case STOP:
 					/*
 					 * the process manager process stops upon receiving message
@@ -151,6 +156,13 @@ public class ProcessManager {
 
 			}
 
+			/*
+			 * Clear Up
+			 */
+
+			for (Process p : manager.runningNodes) {
+				p.destroy();
+			}
 			master.close();
 
 		} catch (IOException e) {
@@ -172,6 +184,12 @@ public class ProcessManager {
 		idToSlave.remove(id);
 	}
 
+	/**
+	 * Sends a message(SUSPEND, RESTART etc) to a slave
+	 * 
+	 * @param id
+	 * @param info
+	 */
 	public void sendMessage(int id, Message info) {
 		ProcessMessage message = new ProcessMessage();
 		message.setpId(id);
@@ -211,6 +229,7 @@ public class ProcessManager {
 			ObjectInputStream in = new ObjectInputStream(
 					socket.getInputStream());
 			Object o = in.readObject();
+			System.out.println("Read Successful");
 			socket.close();
 
 			/*

@@ -1,15 +1,15 @@
-Architecture:
+Overall Description:
 
 There are two important classes implemented in this project: ProcessManager and SlaveNode.
 
 ProcessManager: ProcessManager represents the sever which responsible for task launching, managing and migrating. When
-the launch command from user is received, ProcessManager will initialize the task designated by user(in this project we
-implemented two classes implementing MigratableProcess, which are ReverseWordList and FactorialProcess) and distribute
-the task to SlaveNode to have the task running on SlaveNode. In the middle of task executing, the user can send command
-to ProcessManager to suspend and migrate specific running task from one slave node to another.
+a launch command from a user is received, ProcessManager will instantiate the task designated by user from its name(in this project we
+implemented two classes implementing MigratableProcess, which are ReverseWordList and FactorialProcess) and then assign
+the task to a SlaveNode to have the task running on SlaveNode. During the time the task is being executed, the user can send command
+to ProcessManager to suspend the task or migrate the running task from one slave node to another.
 
-SlaveNode: The SlaveNode class represents the server which responsible for task executing. The SlaveNode Serve, after
-starting, wait for the command from ProcessManager using the accept() method. After the messages from ProcessManager are
+SlaveNode: The SlaveNode class represents a server which is responsible for task execution. The SlaveNode Server, after
+starting, continuely waits for a command from ProcessManager. After a messages from ProcessManager is
 received, the SlaveNode cast the received the object as an ProcessMessage object. By using the checkMessage() method the
 SlaveNode would be able to know which kind the message belong to. In this project, there are four kind of message that
 would be used between ProcessManager and SlaveNode:
@@ -33,18 +33,3 @@ would be used between ProcessManager and SlaveNode:
    The ProcessManager will send the task id along with message. The SlaveNode, after receiving the message, will try to
     locate the corresponding task in hashmap. If the task object is found, the SlaveNode will use the suspend() methond
     to suspend the task and send the task object back to the ProcessManager.
-
-
-
-Manual
-
-The process of executing the SlaveNode and ProcessManager is as below:
-
-1. Running the SlaveNode with the argument as below:
-    "usage: SlaveNode <portNum> <nodeID>"
-
-   In <portNum> the user specify which port the SlaveNode would use to communicate with ProcessManager. The user can
-   launch the SlaveNode multiple times to simulate multiple Slave Server.
-
-2. Running the ProcessManager without any argument, than follow the instruction of given by ProcessManager to launch,
-   suspend and migrate task from node to node.
