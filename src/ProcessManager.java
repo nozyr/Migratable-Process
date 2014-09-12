@@ -195,6 +195,10 @@ public class ProcessManager {
 		message.setpId(id);
 		message.setMessage(info);
 		SlaveInfo worker = idToSlave.get(id);
+		if (worker == null) {
+			System.out.println("Incorrect process id");
+			return;
+		}
 		try {
 			Socket s = new Socket(worker.getHostName(), worker.getPort());
 			ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
@@ -215,6 +219,10 @@ public class ProcessManager {
 	 */
 	public void migrate(int id) {
 		SlaveInfo worker = idToSlave.get(id);
+		if (worker == null) {
+			System.out.println("Incorrect process id");
+			return;
+		}
 		try {
 			/*
 			 * Send message to the slave that is currently executing the task,
