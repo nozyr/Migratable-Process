@@ -31,6 +31,7 @@ public class ProcessManagerShowOff {
 	private Map<Integer, MigratableProcess> idToProcess; // mapping from process
 															// id to process
 	private Map<Integer, SlaveInfo> idToSlave;
+	private List<Process> runningNodes;
 
 	public ProcessManagerShowOff() {
 		/*
@@ -41,6 +42,7 @@ public class ProcessManagerShowOff {
 		processList = new LinkedList<Integer>();
 		idToProcess = new HashMap<Integer, MigratableProcess>();
 		idToSlave = new HashMap<Integer, SlaveInfo>();
+		runningNodes = new LinkedList<Process>();
 
 		this.setUp();
 
@@ -61,7 +63,7 @@ public class ProcessManagerShowOff {
 			slaves.add(new SlaveInfo(port));
 		}
 		System.out.println(slaves.size() + "slaves are started");
-		// this.startSlaves();
+		this.startSlaves();
 		Thread executor = new Thread(new UserCommandExecutor(scan));
 		executor.start();
 
@@ -70,6 +72,22 @@ public class ProcessManagerShowOff {
 	/**
 	 * Let slaves start running
 	 */
+	private void startSlaves() {
+		for (int i = 0; i < slaves.size(); i++) {
+			ProcessBuilder builder = new ProcessBuilder("java", "SlaveNode",
+					String.valueOf(slaves.get(i).getPort()), String.valueOf(i));
+
+			builder.redirectErrorStream(true);
+			builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+
+			try {
+				Process node = builder.start();
+				runningNodes.add(node);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public static void main(String[] args) {
 
@@ -141,12 +159,15 @@ public class ProcessManagerShowOff {
 			/*
 			 * Clean Up
 			 */
+
+			for (Process p : manager.runningNodes) {
+				p.destroy();
+			}
 			master.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -173,6 +194,10 @@ public class ProcessManagerShowOff {
 		message.setpId(id);
 		message.setMessage(info);
 		SlaveInfo worker = idToSlave.get(id);
+		if (worker == null) {
+			System.out.println("Incorrect process id");
+			return;
+		}
 		try {
 			Socket s = new Socket(worker.getHostName(), worker.getPort());
 			ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
@@ -193,6 +218,10 @@ public class ProcessManagerShowOff {
 	 */
 	public void migrate(int id) {
 		SlaveInfo worker = idToSlave.get(id);
+		if (worker == null) {
+			System.out.println("Incorrect process id");
+			return;
+		}
 		try {
 			/*
 			 * Send message to the slave that is currently executing the task,
@@ -209,6 +238,14 @@ public class ProcessManagerShowOff {
 			Object o = in.readObject();
 			System.out.println("Read Successful");
 			socket.close();
+
+			if (o instanceof ProcessMessage) {
+				ProcessMessage p = (ProcessMessage) o;
+				if (p.getMessage() == Message.FINISHED) {
+					this.remove(id);
+				}
+				return;
+			}
 
 			/*
 			 * Migrate the task to a new worker to execute
@@ -238,7 +275,6 @@ public class ProcessManagerShowOff {
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
