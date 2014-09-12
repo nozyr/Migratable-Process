@@ -22,13 +22,13 @@ public class ReverseWordList implements MigratableProcess{
     private volatile boolean suspending = false;
 
     public ReverseWordList(String[] args) throws Exception {
-        if (args.length != 3) {
+        if (args.length != 2) {
             System.out.println("usage: ReverseWordList <inputFile> <outputFile>");
             throw new Exception("Invalid Arguments");
         }
 
-        inFile = new TransactionalFileInputStream(args[1]);
-        outFile = new TransactionalFileOutputStream(args[2], false);
+        inFile = new TransactionalFileInputStream(args[0]);
+        outFile = new TransactionalFileOutputStream(args[1], false);
         this.phase = Phase.Reading;
         this.Reversed = "";
     }
