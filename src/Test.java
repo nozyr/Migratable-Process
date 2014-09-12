@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 
 public class Test {
 	private static final String HOST = "localhost";
-	private static final int PORT = 1440;
+	private static final int PORT = 15440;
  
 
 	public static void main(String args[]) {
@@ -19,7 +19,7 @@ public class Test {
 			arg1[1] = "in.txt";
 			arg1[2] = "out.txt";
 
-			launchGrep.setClassName("ReverseWordList");
+			launchGrep.setClassName("GrepProcess");
 			launchGrep.setArgs(arg1);
 			launchGrep.setMessage(Message.LAUNCH);
 

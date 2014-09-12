@@ -97,8 +97,9 @@ public class ProcessManager {
 				/*
 				 * The process managers is polling for connections
 				 */
+				System.out.println("waiting for connection");
 				Socket connection = master.accept();
-				System.out.println("wtf");
+				System.out.println("connected");
 				ObjectInputStream in = new ObjectInputStream(
 						connection.getInputStream());
 				Object o = in.readObject();
@@ -116,8 +117,7 @@ public class ProcessManager {
 					 * The manager launches a process when receiving "launch"
 					 * and give back the assigned pId
 					 */
-					System.out.println("Launch");
-					int assignedId = manager.lauch(message.getClassName(),
+					int assignedId = manager.launch(message.getClassName(),
 							message.getArgs());
 					out.write(assignedId);
 					break;
@@ -125,8 +125,18 @@ public class ProcessManager {
 					/*
 					 * The manager migrate the process
 					 */
-					manager.Migrate(message.getpId());
+					manager.migrate(message.getpId());
 					break;
+				case SUSPEND:
+					/*
+					 * Suspend the process with the given ID
+					 */
+					manager.sendMessage(message.getpId(), Message.SUSPEND);
+				case RESTART:
+					/*
+					 * Restart the process with the given ID
+					 */
+					manager.sendMessage(message.getpId(), Message.RESTART);
 				case STOP:
 					/*
 					 * the process manager process stops upon receiving message
@@ -162,12 +172,30 @@ public class ProcessManager {
 		idToSlave.remove(id);
 	}
 
+	public void sendMessage(int id, Message info) {
+		ProcessMessage message = new ProcessMessage();
+		message.setpId(id);
+		message.setMessage(info);
+		SlaveInfo worker = idToSlave.get(id);
+		try {
+			Socket s = new Socket(worker.getHostName(), worker.getPort());
+			ObjectOutputStream out = new ObjectOutputStream(s.getOutputStream());
+			out.writeObject(message);
+			s.close();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
 	/**
 	 * Migrate a process from one slave to another
 	 * 
 	 * @param id
 	 */
-	public void Migrate(int id) {
+	public void migrate(int id) {
 		SlaveInfo worker = idToSlave.get(id);
 		try {
 			/*
@@ -196,12 +224,14 @@ public class ProcessManager {
 			int index = slaves.indexOf(worker);
 			index++;
 			SlaveInfo newWorker = slaves.get(index % slaves.size());
+			idToSlave.put(id, newWorker);
 
 			/*
 			 * Send the task to the new slave for executing
 			 */
 			socket = new Socket(newWorker.getHostName(), newWorker.getPort());
 			message = new ProcessMessage(id, toMigrate, Message.LAUNCH);
+			System.out.println("send");
 			out = new ObjectOutputStream(socket.getOutputStream());
 			out.writeObject(message);
 			socket.close();
@@ -222,7 +252,7 @@ public class ProcessManager {
 	 * @param className
 	 * @param args
 	 */
-	public int lauch(String className, String[] args) {
+	public int launch(String className, String[] args) {
 
 		int id = -1;
 		try {

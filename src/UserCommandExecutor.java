@@ -6,6 +6,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+/**
+ * This thread takes user command from command line and then send it to master
+ * 
+ * @author weisiyu
+ * 
+ */
 public class UserCommandExecutor implements Runnable {
 
 	private static final String SERVER_HOST = "localhost";
@@ -28,10 +34,11 @@ public class UserCommandExecutor implements Runnable {
 
 			while (true) {
 				String line = scan.nextLine();
-				Socket connection = new Socket(SERVER_HOST, SERVER_PORT);
+				Socket connection;
 				ObjectOutputStream out;
 				String[] arguments = line.split("\\W");
 				if (arguments[0].equalsIgnoreCase(STOP_SIGN)) {
+					connection = new Socket(SERVER_HOST, SERVER_PORT);
 					ProcessMessage migrate = new ProcessMessage();
 					migrate.setMessage(Message.STOP);
 					out = new ObjectOutputStream(connection.getOutputStream());
@@ -50,7 +57,11 @@ public class UserCommandExecutor implements Runnable {
 						continue;
 					}
 					switch (message) {
+					/*
+					 * launch a process
+					 */
 					case LAUNCH:
+						connection = new Socket(SERVER_HOST, SERVER_PORT);
 						task.setMessage(Message.LAUNCH);
 						task.setClassName(arguments[1]);
 						task.setArgs(getArguments(task, scan));
@@ -64,7 +75,11 @@ public class UserCommandExecutor implements Runnable {
 										+ id);
 						connection.close();
 						break;
+					/*
+					 * Migrate a process
+					 */
 					case MIGRATE:
+						connection = new Socket(SERVER_HOST, SERVER_PORT);
 						ProcessMessage migrate = new ProcessMessage();
 						migrate.setMessage(Message.MIGRATE);
 						migrate.setpId(Integer.parseInt(arguments[1]));
@@ -72,6 +87,26 @@ public class UserCommandExecutor implements Runnable {
 								connection.getOutputStream());
 						out.writeObject(migrate);
 
+						connection.close();
+						break;
+					case SUSPEND:
+						connection = new Socket(SERVER_HOST, SERVER_PORT);
+						ProcessMessage suspend = new ProcessMessage();
+						suspend.setMessage(Message.SUSPEND);
+						suspend.setpId(Integer.parseInt(arguments[1]));
+						out = new ObjectOutputStream(
+								connection.getOutputStream());
+						out.writeObject(suspend);
+						connection.close();
+						break;
+					case RESTART:
+						connection = new Socket(SERVER_HOST, SERVER_PORT);
+						ProcessMessage restart = new ProcessMessage();
+						restart.setMessage(Message.RESTART);
+						restart.setpId(Integer.parseInt(arguments[1]));
+						out = new ObjectOutputStream(
+								connection.getOutputStream());
+						out.writeObject(restart);
 						connection.close();
 						break;
 					default:
@@ -91,10 +126,9 @@ public class UserCommandExecutor implements Runnable {
 	private static void printUsage() {
 		System.out
 				.println("*** Usage <Operation> <Process Name/Process Id> ***");
+		System.out.println("*** Launch Process Name / Migrate Process Id***");
 		System.out
-				.println("*** Launch ***");
-		System.out
-				.println("*** Sample Usage:\n launch GrepProcess\n migrate 2\n ***");
+				.println("*** Sample Usage:\n***launch GrepProcess***\n***migrate 2\n***");
 	}
 
 	private static void setUp() {

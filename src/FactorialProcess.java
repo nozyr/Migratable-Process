@@ -8,10 +8,10 @@ public class FactorialProcess implements MigratableProcess {
 	 * 
 	 */
 	private static final long serialVersionUID = -8499330984331142768L;
-	private long result;
+	private long result = 1;
 	private TransactionalFileInputStream inFile;
 	private TransactionalFileOutputStream outFile;
-	private boolean suspending;
+	private volatile boolean suspending;
 
 	public FactorialProcess(String[] args) throws Exception {
 		if (args.length != 2) {
@@ -19,20 +19,15 @@ public class FactorialProcess implements MigratableProcess {
 					.println("usage: FactorialProcess <inputFile> <outputFile>");
 			throw new Exception("Invalid Arguments");
 		}
-		inFile = new TransactionalFileInputStream(args[1]);
-		outFile = new TransactionalFileOutputStream(args[2], false);
+		inFile = new TransactionalFileInputStream(args[0]);
+		outFile = new TransactionalFileOutputStream(args[1], false);
 	}
 
 	@Override
 	public void suspend() {
 		suspending = true;
-		while (suspending) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		while (suspending)
+			;
 	}
 
 	@Override
@@ -50,12 +45,22 @@ public class FactorialProcess implements MigratableProcess {
 				}
 				int num = Integer.parseInt(line);
 				result *= num;
-				out.println("The factorial of " + num + "is " + result);
+				System.out.println("The factorial of " + num + " is " + result);
+				out.println("The factorial of " + num + " is " + result);
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
+			// Make Factorial take longer so that we don't require extremely
+			// large files for interesting results
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// ignore it
+			}
+			suspending = false;
+			out.close();
 
 		}
 	}

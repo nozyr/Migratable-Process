@@ -7,111 +7,110 @@ import java.io.PrintStream;
  * Created by WITAN on 9/10/14.
  */
 
-public class ReverseWordList implements MigratableProcess{
-    private enum Phase {
-        Reading, Trim, CountLength, Reverse, Write, Finished
-    }
-    private static final long serialVersionUID = -123456789;
-    private TransactionalFileInputStream inFile;
-    private TransactionalFileOutputStream outFile;
-    private String line;
-    private String Reversed;
-    private Phase phase;
-    private int end = 0;
+public class ReverseWordList implements MigratableProcess {
+	private enum Phase {
+		Reading, Trim, CountLength, Reverse, Write, Finished
+	}
 
-    private volatile boolean suspending = false;
+	private static final long serialVersionUID = -123456789;
+	private TransactionalFileInputStream inFile;
+	private TransactionalFileOutputStream outFile;
+	private String line;
+	private String Reversed;
+	private Phase phase;
+	private int end = 0;
 
-    public ReverseWordList(String[] args) throws Exception {
-        if (args.length != 3) {
-            System.out.println("usage: GrepProcess <inputFile> <outputFile>");
-            throw new Exception("Invalid Arguments");
-        }
+	private volatile boolean suspending = false;
 
-        inFile = new TransactionalFileInputStream(args[1]);
-        outFile = new TransactionalFileOutputStream(args[2], false);
-        this.phase = Phase.Reading;
-        this.Reversed = "";
-    }
+	public ReverseWordList(String[] args) throws Exception {
+		if (args.length != 2) {
+			System.out.println("usage: GrepProcess <inputFile> <outputFile>");
+			throw new Exception("Invalid Arguments");
+		}
 
-    public void run() {
-        PrintStream out = new PrintStream(outFile);
-        DataInputStream in = new DataInputStream(inFile);
+		inFile = new TransactionalFileInputStream(args[0]);
+		outFile = new TransactionalFileOutputStream(args[1], false);
+		this.phase = Phase.Reading;
+		this.Reversed = "";
+	}
 
-        try {
-            while (!suspending) {
+	public void run() {
+		PrintStream out = new PrintStream(outFile);
+		DataInputStream in = new DataInputStream(inFile);
 
-                switch (this.phase) {
-                    case Reading:
-                        this.line = in.readLine();
-                        if (this.line == null){
-                           this.phase = Phase.Finished;
-                            continue;
-                        }
-                        this.phase = Phase.Trim;
-                        break;
-                    case Trim:
-                        this.line = this.line.trim();
-                        if (this.line.equals(""))
-                        {
-                            this.phase = Phase.Write;
-                        }
-                        this.phase = Phase.CountLength;
-                        break;
-                    case CountLength:
-                        this.line = " " + this.line;
-                        this.end = this.line.length();
-                        this.phase = Phase.Reverse;
-                        break;
-                    case Reverse:
-                        for(int i=this.end - 1; i>= 0; i--)
-                        {
-                            if(this.line.charAt(i)==' ')
-                            {
-                                this.Reversed=this.Reversed + this.line.substring(i, this.end);
-//                                System.out.println(this.Reversed);
-                                if(i!=0)
-                                {
-                                    while(this.line.charAt(i-1)==' ')
-                                    {
-                                        i=i-1;
-                                    }
-                                    this.end=i;
-                                }
-                            }
-                        }
-                        this.phase = Phase.Write;
-                        break;
-                    case Write:
-                        out.println(this.Reversed);
-                        this.Reversed = "";
-                        this.phase = Phase.Reading;
-                        break;
-                    case Finished:
-                        System.out.println("Task Finished");
-                        this.suspend();
-                    default:
-                        break;
-                }
+		try {
+			while (!suspending) {
 
-                // Make grep take longer so that we don't require extremely
-                // large files for interesting results
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    // ignore it
-                }
-            }
-        } catch (EOFException e) {
-            // End of File
-        } catch (IOException e) {
-            System.out.println("GrepProcess: Error: " + e);
-        }
-        out.close();
-        suspending = false;
-    }
+				switch (this.phase) {
+				case Reading:
+					this.line = in.readLine();
+					if (this.line == null) {
+						this.phase = Phase.Finished;
+						continue;
+					}
+					this.phase = Phase.Trim;
+					break;
+				case Trim:
+					this.line = this.line.trim();
+					if (this.line.equals("")) {
+						this.phase = Phase.Write;
+					}
+					this.phase = Phase.CountLength;
+					break;
+				case CountLength:
+					this.line = " " + this.line;
+					this.end = this.line.length();
+					this.phase = Phase.Reverse;
+					break;
+				case Reverse:
+					for (int i = this.end - 1; i >= 0; i--) {
+						if (this.line.charAt(i) == ' ') {
+							this.Reversed = this.Reversed
+									+ this.line.substring(i, this.end);
+							// System.out.println(this.Reversed);
+							if (i != 0) {
+								while (this.line.charAt(i - 1) == ' ') {
+									i = i - 1;
+								}
+								this.end = i;
+							}
+						}
+					}
+					this.phase = Phase.Write;
+					break;
+				case Write:
+					System.out.println(this.Reversed);
+					out.println(this.Reversed);
+					this.Reversed = "";
+					this.phase = Phase.Reading;
+					break;
+				case Finished:
+					System.out.println("Task Finished");
+					this.suspend();
+				default:
+					break;
+				}
 
-    public void suspend() {
-        suspending = true;
-        while (suspending);
-    }
+				// Make grep take longer so that we don't require extremely
+				// large files for interesting results
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// ignore it
+				}
+			}
+		} catch (EOFException e) {
+			// End of File
+		} catch (IOException e) {
+			System.out.println("GrepProcess: Error: " + e);
+		}
+		out.close();
+		suspending = false;
+	}
+
+	public void suspend() {
+		suspending = true;
+		while (suspending)
+			;
+	}
 }

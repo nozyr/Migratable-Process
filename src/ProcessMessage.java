@@ -3,7 +3,7 @@ import java.io.Serializable;
 public class ProcessMessage implements Serializable {
 
 	/**
-	 * 
+	 * An encapsulation of the message being sent between processes
 	 */
 	private static final long serialVersionUID = -3467973832854667253L;
 
