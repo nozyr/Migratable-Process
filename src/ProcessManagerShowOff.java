@@ -63,7 +63,7 @@ public class ProcessManagerShowOff {
 			slaves.add(new SlaveInfo(port));
 		}
 		System.out.println(slaves.size() + "slaves are started");
-		this.startSlaves();
+		//this.startSlaves();
 		Thread executor = new Thread(new UserCommandExecutor(scan));
 		executor.start();
 
@@ -160,9 +160,9 @@ public class ProcessManagerShowOff {
 			 * Clean Up
 			 */
 
-			for (Process p : manager.runningNodes) {
-				p.destroy();
-			}
+			// for (Process p : manager.runningNodes) {
+			// p.destroy();
+			// }
 			master.close();
 
 		} catch (IOException e) {
