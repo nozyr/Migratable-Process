@@ -236,12 +236,13 @@ public class ProcessManager {
 			ObjectInputStream in = new ObjectInputStream(
 					socket.getInputStream());
 			Object o = in.readObject();
-			System.out.println("Read Successful");
 			socket.close();
 
 			if (o instanceof ProcessMessage) {
 				ProcessMessage p = (ProcessMessage) o;
 				if (p.getMessage() == Message.FINISHED) {
+					System.out.println("The execution of the given task is "
+							+ "already finished and thus cannot be migrated");
 					this.remove(id);
 				}
 				return;
