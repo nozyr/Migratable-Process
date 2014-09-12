@@ -63,7 +63,7 @@ public class ProcessManagerShowOff {
 			slaves.add(new SlaveInfo(port));
 		}
 		System.out.println(slaves.size() + "slaves are started");
-		this.startSlaves();
+		//this.startSlaves();
 		Thread executor = new Thread(new UserCommandExecutor(scan));
 		executor.start();
 
@@ -100,7 +100,6 @@ public class ProcessManagerShowOff {
 				/*
 				 * The process managers is polling for connections
 				 */
-				System.out.println("waiting for connection");
 				Socket connection = master.accept();
 				System.out.println("connected");
 				ObjectInputStream in = new ObjectInputStream(
@@ -160,9 +159,9 @@ public class ProcessManagerShowOff {
 			 * Clean Up
 			 */
 
-			for (Process p : manager.runningNodes) {
-				p.destroy();
-			}
+			// for (Process p : manager.runningNodes) {
+			// p.destroy();
+			// }
 			master.close();
 
 		} catch (IOException e) {

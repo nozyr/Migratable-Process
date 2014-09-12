@@ -100,7 +100,6 @@ public class ProcessManager {
 				/*
 				 * The process managers is polling for connections
 				 */
-				System.out.println("waiting for connection");
 				Socket connection = master.accept();
 				System.out.println("connected");
 				ObjectInputStream in = new ObjectInputStream(
