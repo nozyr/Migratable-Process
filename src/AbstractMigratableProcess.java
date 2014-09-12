@@ -12,7 +12,7 @@ public abstract class AbstractMigratableProcess implements MigratableProcess {
 	}
 
 	@Override
-	public void suspend() {
+	public void suspend(Thread thd) {
 		// TODO Auto-generated method stub
 
 	}

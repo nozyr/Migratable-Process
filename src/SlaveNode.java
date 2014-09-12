@@ -12,6 +12,7 @@ import java.util.HashMap;
 public class SlaveNode {
 
 	private static HashMap<Integer, MigratableProcess> TaskMap;
+    private static HashMap<Integer, Thread> ThdMap;
 
 	public static void main(String[] args) throws Exception {
         if (args.length != 2) {
@@ -20,6 +21,7 @@ public class SlaveNode {
         }
 		ServerSocket listen_Socket = null;
 		TaskMap = new HashMap<Integer, MigratableProcess>();
+        ThdMap = new HashMap<Integer, Thread>();
 
 		try {
 			/* Initialize the Server Socket on port provided by args */
@@ -68,6 +70,7 @@ public class SlaveNode {
 				Thread task_th = new Thread(task_Message.getTask());
 				task_th.start();
 				TaskMap.put(task_Message.getpId(), task_Message.getTask());
+                ThdMap.put(task_Message.getpId(), task_th);
 				break;
 			case SUSPEND:
 				/* Suspend the task currently running in this node */
@@ -75,14 +78,22 @@ public class SlaveNode {
 						+ " Received at Node " + args[1]);
 				if (TaskMap.containsKey(task_Message.getpId())) {
 					MigratableProcess task = TaskMap.get(task_Message.getpId());
-					task.suspend();
+                    Thread thread = ThdMap.get(task_Message.getpId());
+                    ThdMap.remove(task_Message.getpId());
+                    if (thread.getState() == Thread.State.TERMINATED){
+                        //send message to ProcessManager
+                    }
+                    else{
+                        task.suspend(thread);
+                    }
 				}
 				break;
 			case RESTART:
-                System.out.println("Command " + Message.STOP.name() + " Received at Node " + args[1]);
+                System.out.println("Command " + Message.RESTART.name() + " Received at Node " + args[1]);
                 if (TaskMap.containsKey(task_Message.getpId())){
                     MigratableProcess task = TaskMap.get(task_Message.getpId());
                     Thread task_rs = new Thread(task);
+                    ThdMap.put(task_Message.getpId(), task_rs);
                     task_rs.start();
                 }
 				break;
@@ -95,7 +106,18 @@ public class SlaveNode {
 						+ " Received at Node " + args[1]);
 				if (TaskMap.containsKey(task_Message.getpId())) {
 					MigratableProcess task = TaskMap.get(task_Message.getpId());
-					task.suspend();
+                    Thread thread = ThdMap.get(task_Message.getpId());
+                    ThdMap.remove(task_Message.getpId());
+                    if (thread.getState() == Thread.State.TERMINATED)
+                    {
+                        TaskMap.remove(task_Message.getpId());
+                        ThdMap.remove(task_Message.getpId());
+                        //send some message
+                        break;
+                    }
+                    else{
+                        task.suspend(thread);
+                    }
 					ObjectOutputStream oos = null;
 					try {
 						oos = new ObjectOutputStream(
