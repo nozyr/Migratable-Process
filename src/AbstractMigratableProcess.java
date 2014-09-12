@@ -7,14 +7,10 @@ public abstract class AbstractMigratableProcess implements MigratableProcess {
 
 	@Override
 	public void run() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void suspend(Thread thd) {
-		// TODO Auto-generated method stub
-
 	}
 
 	public AbstractMigratableProcess(String[] args) {
